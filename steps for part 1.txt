@@ -1,0 +1,89 @@
+create database universe;
+
+create table galaxy(galaxy_id serial primary key not null, name varchar(255) unique,  apparent_magnitude numeric not null, distance_kpc numeric not null);
+
+insert into galaxy (name, apparent_magnitude, distance_kpc) values 
+('Milky Way', -6.5, 0),
+('Large Magellanic Cloud', 2.7, 49), 
+('Small Magellanic Cloud', 2.7, 61), 
+('Andromeda Galaxy', 3.4, 770), 
+('Triangulum Galaxy', 5.7, 890), 
+('Centaurus A', 6.84, 4.2), 
+('Bodes Galaxy', 6.94, 3.7), 
+('Sculptor Galaxy', 8, 3.7);
+
+alter table galaxy add column constellation text;
+
+update galaxy set constellation = 'Sagittarius' where galaxy_id=1;
+update galaxy set constellation = 'Dorado_Mensa' where galaxy_id=2;
+update galaxy set constellation = 'Tucana' where galaxy_id=3;
+update galaxy set constellation = 'Andromeda' where galaxy_id=4;
+update galaxy set constellation = 'Triangulum' where galaxy_id=5;
+update galaxy set constellation = 'Centaurus' where galaxy_id=6;
+update galaxy set constellation = 'Ursa_Major' where galaxy_id=7;
+update galaxy set constellation = 'Sculptor' where galaxy_id=8;
+
+create table star(star_id serial primary key not null, name varchar(255) unique, current_apparent_magnitude numeric not null, mass_dev_mass_earth numeric not null, stellar_classification text, has_name_instead_code boolean default(false), galaxy_id int,  constraint fk_galaxy foreign key (galaxy_id) references galaxy(galaxy_id));
+
+insert into star(name, current_apparent_magnitude, mass_dev_mass_earth, stellar_classification, has_name_instead_code, galaxy_id) values 
+('2MASS J1921-1244', 12.46, 0.69, 'K6V', false, 1),
+('Lalande 21185', 7.52, 0.39, 'M2V', true, 7),
+('HD 146248', 9.47, 1.23, 'G2_3IV', false, 5),
+('Alpha Centauri AB', 1.33, 0.907, 'K1V', true, 6),
+('TYC 9387-2515-1', 11.45, 0.86, 'K1V', false, 2),
+('2MASS J1941-4602', 12.4, 0.15, 'M4_M6', false, 3),
+('Ross 248', 12.29, 0.136, 'M6V', true, 4),
+('Gliese 710', 9.6, 0.5, 'K7V', true, 8);
+
+create table planet (planet_id serial primary key not null, name varchar(255) unique not null, mass_10pow24_kg numeric not null, diameter int, global_magnetic_field Boolean default(false), rotation_period_hours text, star_id int, constraint fk_star foreign key (star_id) references star(star_id));
+
+insert into planet (name, mass_10pow24_kg, diameter, global_magnetic_field, rotation_period_hours,star_id) values
+('Mercury', 0.33, 4879, true, '1407.6', 1),
+('Venus', 4.87, 12104, false, '-5832.5', 2),
+('Earth', 5.97, 12756, true, '23.9', 3),
+('Moon', 0.073, 3475, false, '655.7', 4),
+('Mars', 0.642, 6792, false, '24.6', 5),
+('Jupiter', 1898, 142984, true, '9.9', 6),
+('Saturn', 568, 120536, true, '10.7', 7),
+('Uranus', 86.8, 51118, true, '-17.2', 8),
+('Neptune', 102, 49528, true, '16.1', 1),
+('Pluto', 0.013, 2376, false, '-153.3', 2),
+('Some New', 1, 5555, false, '5555.5', 3),
+('Else One', 1, 6666, true, '6666.6', 4);
+
+create table moon (moon_id serial primary key not null, name varchar(255) unique not null, mean_radius_km numeric, has_parent Boolean default(true), parent text not null, announced_year int not null, planet_id int, constraint fk_planet foreign key (planet_id) references planet(planet_id));
+
+insert into moon (name, mean_radius_km, has_parent, parent, announced_year, planet_id) values 
+('Moon', 1738, true, 'Earth', 1, 3),
+('Phobos', 11.267, true, 'Mars', 1877, 5),
+('Deimos', 6.2, true, 'Mars', 1877, 5),
+('Io', 1821.6, true, 'Jupiter', 1610, 6),
+('Europa', 1560.8, true, 'Jupiter', 1610, 6),
+('Mimas', 198.2, true, 'Saturn', 1789, 7),
+('Enceladus', 252.1, true, 'Saturn', 1789, 7),
+('Tethys', 533.1, true, 'Saturn', 1686, 7),
+('Dione', 561.4, true, 'Saturn', 1686, 7),
+('Ariel', 578.9, true, 'Uranus', 1851, 8),
+('Umbriel', 584.7, true, 'Uranus', 1851, 8),
+('Titania', 788.9, true, 'Uranus', 1787, 9),
+('Triton', 1353.4, true, 'Neptune', 1846, 9),
+('Nereid', 178.5, true, 'Neptune', 1949, 9),
+('Naiad', 30.2, true, 'Neptune', 1989, 9),
+('Vanth', 221, true, 'Orcus', 2007, 11),
+('Nix', 22.5, true, 'Pluto', 2005, 10),
+('Charon', 606, true, 'Pluto', 1978, 12),
+('Namaka', 85, true, 'Haumea', 2005, 12),
+('Weywot', 40.5, true, 'Quaoar', 2007, 1),
+('Dusnomia', 350, true, 'Eris', 2005, 2),
+('Xiangliu', 90, true, 'Gonggong', 2016, 4);
+
+create table last_table (last_table_id serial primary key not null, name varchar(255) unique not null, radius_km numeric, has_parent Boolean default(true), parent text not null, moon_id int, constraint fk_moon foreign key (moon_id) references moon(moon_id));
+
+insert into last_table (name, radius_km, has_parent, parent, moon_id) values 
+('Row 1', 11111, false, 'None', 1),
+('Row 2', 22222, false, 'None', 2),
+('Row 3', 33333, false, 'None', 3),
+('Row 4', 44444, false, 'None', 4),
+('Row 5', 55555, false, 'None', 5);
+
+// next insert command to save your database to file;
